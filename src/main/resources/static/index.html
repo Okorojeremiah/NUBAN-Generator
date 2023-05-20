@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>NUBAN Generator</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+        angular.module('nubanApp', [])
+            .controller('HomeController', function($http) {
+                let vm = this;
+                vm.bankCode = '';
+                vm.serialNumber = '';
+                vm.nuban = '';
+                vm.error = '';
+
+                vm.generateNUBAN = function() {
+                    const requestData = {
+                        bankCode: vm.bankCode,
+                        serialNumber: vm.serialNumber
+                    };
+
+                    $http.post('/api/v1/user/generateNUBAN', requestData)
+                        .then(function(response) {
+                            vm.nuban = response.data.data.nuban;
+                            vm.error = '';
+                        })
+                        .catch(function(response) {
+                            vm.error = response.data.data.message;
+                            vm.nuban = '';
+                        });
+                };
+            })
+            .controller('AboutController', function() {
+                let vm = this;
+                vm.message = 'This is a NUBAN generator page.';
+            });
+    </script>
+</head>
+<body ng-app="nubanApp">
+<h1>NUBAN Generator</h1>
+
+<div ng-controller="HomeController as vm">
+    <h2>Home</h2>
+    <p>Enter a 3 digits bank institution code and a serial code not greater than 9 digits</p><br>
+    <form>
+        <label for="bankCode">Bank Code:</label>
+        <input type="text" id="bankCode" ng-model="vm.bankCode" required>
+
+        <label for="serialNumber">Serial Number:</label>
+        <input type="text" id="serialNumber" ng-model="vm.serialNumber" required>
+
+        <button type="button" ng-click="vm.generateNUBAN()">Generate NUBAN</button>
+    </form>
+
+    <p ng-if="vm.nuban">Generated NUBAN: {{ vm.nuban }}</p>
+    <p ng-if="vm.error"> Error generating NUBAN: {{ vm.error }}</p>
+</div>
+
+<div ng-controller="AboutController as vm">
+    <h2>About</h2>
+    <p>{{ vm.message }}</p>
+</div>
+</body>
+</html>
