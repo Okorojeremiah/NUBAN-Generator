@@ -33,6 +33,4 @@ build/
 .vscode/
 
 # Ignore application properties and config.env files
-application.properties
 config.env
-
